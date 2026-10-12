@@ -13,6 +13,7 @@ import { reduceMotionSurface } from '../surfaces/reduceMotionSurface';
 import { librarySuitePickerSurface } from '../surfaces/librarySuitePickerSurface';
 import { libraryWallLookCommands } from './libraryWallLookCommands';
 import { openCurrentPagePonder } from '../../../services/ponder/pagePonderTarget';
+import { useStartupCollectionStore } from '../../../stores/useStartupCollectionStore';
 
 // src/components/command-palette/commands/settingsCommands.ts
 // Commands in the `settings` group: settings subviews, app toggles, theme, sync, and desktop-only switches.
@@ -38,6 +39,35 @@ export const settingsCommands: CommandPaletteCommand[] = [
     createSettingsAnchorCommand('settings-grid-card-style', 'Grid card style', 'Jump to how the home grid draws its cards', ['card style', 'polaroid', 'grid style', '卡片样式'], 'grid3dCardStyle'),
     createSettingsCommand('settings-general', 'General settings', 'Open general app preferences', ['general', 'language settings', 'locale', '通用', '语言'], 'options', 'general'),
     createSettingsAnchorCommand('settings-home-tabs', 'Home tab visibility', 'Choose which tabs the home screen shows', ['hide tabs', 'home tabs', '首页标签'], 'homeTabsVisibility'),
+    createSettingsAnchorCommand('settings-startup-collection', 'Playlist opened on launch', 'Jump to the playlist that opens on launch', ['startup playlist', 'open playlist on launch', '启动歌单', '启动直达歌单'], 'startupCollection'),
+    {
+        id: 'startup-collection-toggle',
+        group: 'settings',
+        isAvailable: () => useStartupCollectionStore.getState().startupCollection !== null,
+        title: 'Open startup playlist',
+        description: 'Toggle opening the chosen playlist on launch',
+        keywords: ['startup playlist', 'open on launch', 'launch playlist', '启动歌单', '启动直达歌单'],
+        execute: () => {
+            const state = useStartupCollectionStore.getState();
+            if (!state.startupCollection) return false;
+            state.setStartupCollectionEnabled(!state.startupCollectionEnabled);
+            return true;
+        },
+    },
+    {
+        id: 'startup-collection-clear',
+        group: 'settings',
+        isAvailable: () => useStartupCollectionStore.getState().startupCollection !== null,
+        title: 'Clear startup playlist',
+        description: 'Stop opening a playlist on launch',
+        keywords: ['forget launch playlist', 'remove startup target', '取消启动歌单', '不要启动歌单'],
+        execute: () => {
+            const state = useStartupCollectionStore.getState();
+            if (!state.startupCollection) return false;
+            state.clearStartupCollection();
+            return true;
+        },
+    },
     createToggleCommand(
         'home-card-position-toggle',
         'settings',

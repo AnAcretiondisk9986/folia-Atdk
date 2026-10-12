@@ -21,6 +21,7 @@ export const SETTINGS_ANCHOR_DEFINITIONS = {
     // GeneralSettingsSubview (PinnedCommandSettings and PonderHintSettingsSection render inside it)
     languageSettings: { section: 'general', labelKey: 'options.languageSettings' },
     homeTabsVisibility: { section: 'general', labelKey: 'options.homeTabsVisibility' },
+    startupCollection: { section: 'general', labelKey: 'options.startupCollection' },
     rememberHomeCardPosition: { section: 'general', labelKey: 'options.rememberHomeCardPosition' },
     playbackEntryView: { section: 'general', labelKey: 'options.playbackEntryView' },
     // Rendered only when more than one library suite is available (hasLibrarySuiteChoice).

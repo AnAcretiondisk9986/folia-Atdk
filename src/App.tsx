@@ -98,6 +98,7 @@ import { PERSONAL_FM_MODE_COMMAND_ID } from './components/command-palette/comman
 import { usePlaybackUiEffects } from './hooks/usePlaybackUiEffects';
 import { useLibraryPlaybackController } from './hooks/useLibraryPlaybackController';
 import { useNavidromeScrobbleReporter } from './hooks/useNavidromeScrobbleReporter';
+import { useStartupCollectionLaunch } from './hooks/useStartupCollectionLaunch';
 import { useNeteaseScrobbleReporter } from './hooks/useNeteaseScrobbleReporter';
 import { usePlaybackQueueController } from './hooks/usePlaybackQueueController';
 import { usePlaybackTransportController } from './hooks/usePlaybackTransportController';
@@ -968,6 +969,11 @@ export default function App() {
         (collection: GridViewCollectionDescriptor) => navigateToCollection(collection, 'home'),
         [navigateToCollection],
     );
+    // 启动直达歌单：设了目标就在这次启动里把它打开（等歌单数据到位，见 hook 内的窗口与放弃条件）。
+    useStartupCollectionLaunch({
+        localPlaylists,
+        openCollection: openHomeCollection,
+    });
     const handleSaveLyricFilterPattern = useMemo(() => createLyricFilterPatternSaver({
         currentEffectivePattern: lyricFilterEnabled ? lyricFilterPattern : '',
         handleSetLyricFilterPattern,
