@@ -1,0 +1,123 @@
+/* src/appSplash.css
+   开屏（index.html 里的 #app-splash）的词标字体与动画。
+
+   这份样式由 index.html 用一个 <link> 直接引入，而不是从 JS bundle 里 import：
+   <link> 是渲染阻塞资源，样式一定先于首帧就绪，字体请求也因此和 HTML 一起出发，
+   不必等 index.css 和整个 bundle。 */
+
+/* 仓库根 anthropic-fonts-system/ 下的 Anthropic Serif 是可变字体，wght 轴 300–800。
+   开屏要最粗的一档，所以词标用 font-weight: 800 命中轴的最大值；
+   opsz（16–48）交给浏览器的光学尺寸自动匹配，巨型词标会自己拿到 Display 那一段。
+   font-display: block 是为了不让兜底字形先浮现、等字体到了再跳一次——
+   文字在字体可用前干脆不画，浮现动画由 index.html 等字体就绪后才启动。 */
+@font-face {
+  font-family: 'Folia Splash Serif';
+  src: url('../anthropic-fonts-system/Anthropic Serif.ttf') format('truetype');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: block;
+}
+
+#app-splash {
+  position: fixed;
+  inset: 0;
+  /* 压在应用所有层之上：设置弹窗、debug overlay 都在它下面。 */
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #09090b;
+  /* 迅速消失：时长与 utils/appSplash.ts 的 FADE_OUT_MS 同步。 */
+  transition: opacity 200ms ease-in;
+}
+
+#app-splash.is-hiding {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#app-splash .app-splash-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 0.9vw, 18px);
+  /* 字体没到位时退回衬线通用族，出现这一幕说明字体加载失败了，不是常态。 */
+  font-family: 'Folia Splash Serif', Georgia, serif;
+  font-weight: 800;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* 浮现之前不可见，等 index.html 加上 .is-revealing 才开始。
+   初态必须落在两行自己身上，不能挂到 .app-splash-title 上：父级 opacity 会把子元素的
+   浮现动画一并乘掉，词标永远是黑的。 */
+#app-splash .app-splash-owner,
+#app-splash .app-splash-product {
+  opacity: 0;
+}
+
+#app-splash .app-splash-owner {
+  font-size: clamp(15px, 2.4vw, 34px);
+  letter-spacing: 0.1em;
+  /* letter-spacing 会在最后一个字后面也留一份间距，用等量缩进抵掉，居中才不偏。 */
+  text-indent: 0.1em;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+#app-splash .app-splash-product {
+  font-size: clamp(38px, 9vw, 132px);
+}
+
+/* 浮现：两行错开 100ms 落位，眼睛先读到署名，再读到名字。 */
+#app-splash.is-revealing .app-splash-owner {
+  animation: app-splash-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#app-splash.is-revealing .app-splash-product {
+  animation: app-splash-reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both;
+}
+
+/* 消失：只在浮现确实播过之后接管动画，否则（字体迟迟没到就被摘掉）会从 opacity: 1 闪一下。 */
+#app-splash.is-hiding.is-revealing .app-splash-title {
+  animation: app-splash-vanish 200ms ease-in both;
+}
+
+@keyframes app-splash-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.18em);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes app-splash-vanish {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.12em);
+  }
+}
+
+/* 关掉动效的用户直接看到静止的词标；消失照常发生，那是一次状态切换，不是装饰。 */
+@media (prefers-reduced-motion: reduce) {
+  #app-splash .app-splash-owner,
+  #app-splash .app-splash-product {
+    opacity: 1;
+  }
+
+  #app-splash.is-revealing .app-splash-owner,
+  #app-splash.is-revealing .app-splash-product,
+  #app-splash.is-hiding.is-revealing .app-splash-title {
+    animation: none;
+  }
+}

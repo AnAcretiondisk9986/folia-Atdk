@@ -264,6 +264,10 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
         },
         workbox: {
           maximumFileSizeToCacheInBytes: 5000000,
+          // workbox 默认只收 js/css/html，开屏词标用的 Anthropic Serif 是构建产物里的 ttf
+          //（dist/assets 下带 hash），不列进来的话离线启动会退回 Georgia 衬线。
+          // 它不在 public 下，includeAssets 够不着，只能在这里放行。
+          globPatterns: ['**/*.{js,css,html,ttf}'],
           // Docker serves this file dynamically; it must never be pinned in the PWA precache.
           globIgnores: ['**/runtime-config.js', '**/assets/folium-icons/**'],
           runtimeCaching: [{

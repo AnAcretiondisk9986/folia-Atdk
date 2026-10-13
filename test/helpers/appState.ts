@@ -26,7 +26,9 @@ export const GUIDE_VERSION_STORAGE_KEY = 'folia_last_seen_ponder_onboarding_vers
 export const APP_MOUNT_TIMEOUT_MS = 60_000;
 
 /**
- * 等应用挂载完：AppSplashGate 在第一次 mount effect 里摘掉 index.html 的 #app-splash。
+ * 等应用挂载完：AppSplashGate 在第一次 mount effect 里触发 index.html 的 #app-splash 退出。
+ * 遮罩真正从 DOM 摘掉还要等词标浮现补满最短停留（见 src/utils/appSplash.ts），
+ * 但 dev server 下挂载本来就慢得多，这个等待不受影响。
  * 挂载单独给足时间，之后的断言照旧用默认超时，真正的回归不会被放宽的超时掩盖。
  */
 export const waitForAppMounted = async (page: Page) => {
